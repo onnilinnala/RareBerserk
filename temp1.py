@@ -344,13 +344,4 @@ main_table = {
 }
 
 
-def changePiece(row, column, piece):
-    main_table[row][column]["Piece"] = piece
 
-
-def changeKill(row, column, kill):
-    main_table[row][column]["KillSquare"] = kill
-
-
-def getData(row, column, dataType):
-    return main_table[row][column][dataType]
