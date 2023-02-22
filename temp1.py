@@ -349,7 +349,7 @@ def changePiece(row, column, piece):
 
 
 def changeKill(row, column, kill):
-    main_table[row][column]["Piece"] = kill
+    main_table[row][column]["KillSquare"] = kill
 
 
 def getData(row, column, dataType):
