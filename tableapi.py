@@ -161,3 +161,17 @@ def checkColumn(column, row, target_row):
             else:
                 return False
         return True
+
+
+def checkSquareValidity(square):
+    if len(square) == 2:
+        if square[0] == "A" or square[0] == "B" or square[0] == "C" or square[0] == "D" or square[0] == "E" or square[0] == "F" or square[0] == "G" or square[0] == "H" or square[0] == "I":
+            if square[1] == "1" or square[1] == "2" or square[1] == "3" or square[1] == "4" or square[1] == "5" or square[1] == "6" or square[1] == "7" or square[1] == "8" or square[1] == "9":
+                pass
+            else:
+                return False
+        else:
+            return False
+    else:
+        return False
+    return True
