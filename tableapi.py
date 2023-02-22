@@ -19,8 +19,6 @@ def move(piece, target_square):
         column = piece[1]
         target_row = target_square[0]
         target_column = target_square[1]
-        if target_row == row and target_column == column:
-            raise KeyError
         piece = getData(row, column, "Piece")
         is_valid_target = False
         if getData(target_row, target_column, "Piece") is None:
@@ -33,20 +31,18 @@ def move(piece, target_square):
                     print("Success")
                     success = True
                 else:
-                    print("CheckColumn Error!\n")
+                    print("Crash and burn on Column!\n")
                     success = False
             elif row == target_row:
                 if checkRow(row, column, target_column):
                     print("Success")
                     success = True
                 else:
-                    print("CheckRow Error!\n")
+                    print("Crash and burn on Row!\n")
                     success = False
             else:
-                print("Error5")
                 raise KeyError
         else:
-            print("Error6")
             raise KeyError
         if success:
             changePiece(row, column, None)

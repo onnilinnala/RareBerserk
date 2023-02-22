@@ -72,6 +72,10 @@ def askForMove():
         print("Invalid square selected!\n")
         askForMove()
         return
+    if target_square == move_piece:
+        print("No move selected!\n")
+        askForMove()
+        return
     tableapi.move(move_piece, target_square)
     askForMove()
     return
