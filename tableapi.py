@@ -19,7 +19,24 @@ def move(piece, target_square):
         column = piece[1]
         target_row = target_square[0]
         target_column = target_square[1]
+        if row == "E" and column == "5":
+            changeKill(row, column, True)
         piece = getData(row, column, "Piece")
+        print(checkForKill(target_row, target_column, piece))
+        if target_row == "E" and target_column == "5":
+            if piece != "3":
+                print("Test")
+                raise KeyError
+        elif target_row == "A":
+            if target_column == "1" or target_column == "9":
+                if piece != "3":
+                    print("Test")
+                    raise KeyError
+        elif target_row == "I":
+            if target_column == "1" or target_column == "9":
+                if piece != "3":
+                    print("Test")
+                    raise KeyError
         is_valid_target = False
         if getData(target_row, target_column, "Piece") is None:
             is_valid_target = True
@@ -50,6 +67,7 @@ def move(piece, target_square):
             printCurrentTable()
     except KeyError:
         print("Invalid move!\n")
+        return
 
 
 def letterToInt(row):
@@ -104,7 +122,10 @@ def printCurrentTable():
         row_txt = f"({row}) |"
         for column in range(9):
             if table[row][str(column + 1)]["Piece"] is None:
-                row_txt = row_txt + f' |'
+                if table[row][str(column + 1)]["KillSquare"]:
+                    row_txt = row_txt + f'X|'
+                else:
+                    row_txt = row_txt + f' |'
             elif table[row][str(column + 1)]["Piece"] == "1":
                 row_txt = row_txt + f'D|'
             elif table[row][str(column + 1)]["Piece"] == "2":
@@ -175,3 +196,27 @@ def checkSquareValidity(square):
     else:
         return False
     return True
+
+
+def checkForKill(row, column, piece):
+    try:
+        if piece == "1":
+            target = "2"
+        elif piece == "2" or piece == "3":
+            target = "1"
+        left = False
+        right = False
+        up = False
+        down = False
+        if getData(row, str(int(column)+1), "Piece") == target or getData(row, str(int(column)+1), "KillSquare"):
+            right = True
+        elif getData(intToLetter(letterToInt(row)+1), column, "Piece") == target or getData(intToLetter(letterToInt(row)+1), column, "KillSquare"):
+            down = True
+        elif getData(row, str(int(column)-1), "Piece") == target or getData(row, str(int(column)-1), "KillSquare"):
+            left = True
+        elif getData(intToLetter(letterToInt(row)-1), column, "Piece") == target or getData(intToLetter(letterToInt(row)-1), column, "KillSquare"):
+            up = True
+        return left, right, up, down
+    except KeyError:
+        print("Out of bound case")
+        return left, right, up, down

@@ -32,17 +32,21 @@ def start():
     table["I"]["4"]["Piece"] = "1"  # Defender
     table["I"]["5"]["Piece"] = "1"  # Defender
     table["I"]["6"]["Piece"] = "1"  # Defender
-    print(table)
+    table["A"]["9"]["KillSquare"] = True
+    table["I"]["9"]["KillSquare"] = True
+    table["A"]["1"]["KillSquare"] = True
+    table["I"]["1"]["KillSquare"] = True
+    tableapi.printCurrentTable()
     askForMove()
 
 
 def askForMove():
     move_piece = input("Select piece: ").upper()
+    target_square = input("Target square: ").upper()
     if not tableapi.checkSquareValidity(move_piece):
         print("Invalid square selected!\n")
         askForMove()
         return
-    target_square = input("Target square: ").upper()
     if not tableapi.checkSquareValidity(target_square):
         print("Invalid square selected!\n")
         askForMove()
