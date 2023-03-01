@@ -12,8 +12,8 @@ def start():
     table["A"]["6"]["Piece"] = "1"  # Defender
     table["B"]["5"]["Piece"] = "1"  # Defender
     table["C"]["5"]["Piece"] = "2"  # Attacker
-    table["D"]["5"]["Piece"] = "2"  # Attacker
     table["D"]["1"]["Piece"] = "1"  # Defender
+    table["D"]["5"]["Piece"] = "2"  # Attacker
     table["D"]["9"]["Piece"] = "1"  # Defender
     table["E"]["1"]["Piece"] = "1"  # Defender
     table["E"]["2"]["Piece"] = "1"  # Defender
@@ -32,10 +32,10 @@ def start():
     table["I"]["4"]["Piece"] = "1"  # Defender
     table["I"]["5"]["Piece"] = "1"  # Defender
     table["I"]["6"]["Piece"] = "1"  # Defender
-    table["A"]["9"]["KillSquare"] = True
-    table["I"]["9"]["KillSquare"] = True
-    table["A"]["1"]["KillSquare"] = True
-    table["I"]["1"]["KillSquare"] = True
+    table["A"]["9"]["KillSquare"] = True  # Corner
+    table["I"]["9"]["KillSquare"] = True  # Corner
+    table["A"]["1"]["KillSquare"] = True  # Corner
+    table["I"]["1"]["KillSquare"] = True  # Corner
     tableapi.printCurrentTable()
     askForMove()
 
