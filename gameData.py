@@ -1,4 +1,6 @@
 gameData = {
     "kingMoved": False,
-    "currentPosition": None
+    "currentPosition": None,
+    "defenderWin": False,
+    "attacekrWin": False
 }
