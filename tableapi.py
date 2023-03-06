@@ -13,64 +13,24 @@ def getData(row, column, dataType):
     return table[row][column][dataType]
 
 
-def move(piece, target_square):
-    try:
-        row = piece[0]
-        column = piece[1]
-        target_row = target_square[0]
-        target_column = target_square[1]
-        if row == "E" and column == "5":
-            changeKill(row, column, True)
-        piece = getData(row, column, "Piece")
-        if target_row == "E" and target_column == "5":
-            if piece != "3":
-                print("Only king can enter the center square!")
-                return
-        elif target_row == "A" or target_row == "I":
-            if target_column == "1" or target_column == "9":
-                if piece != "3":
-                    print("Only king can enter the corner!")
-                    return
-        if checkForKill(target_row, target_column, piece):
-            print("Target square is instakill!")
-            return
-        is_valid_target = False
-        if getData(target_row, target_column, "Piece") is None:
-            is_valid_target = True
-        else:
-            pass
-        if is_valid_target and piece:
-            if column == target_column:
-                if checkColumn(column, row, target_row):
-                    success = True
-                else:
-                    success = False
-            elif row == target_row:
-                if checkRow(row, column, target_column):
-                    success = True
-                else:
-                    success = False
-            else:
-                return
-        else:
-            return
-        if success:
-            changePiece(row, column, None)
-            changePiece(target_row, target_column, piece)
-            left, right, up, down = checkForKillAround(target_row, target_column, piece)
-            print(left, right, up, down)
-            if left:
-                changePiece(target_row, str(int(target_column)-1), None)
-            if right:
-                changePiece(target_row, str(int(target_column)+1), None)
-            if up:
-                changePiece(intToLetter(letterToInt(target_row)-1), target_column, None)
-            if down:
-                changePiece(intToLetter(letterToInt(target_row)+1), target_column, None)
-            printCurrentTable()
-    except Exception as e:
-        print(f"There was an exception: {e}")
+def move(start_square, target_square):
+    row, column = start_square[0], start_square[1]
+    target_row, target_column = target_square[0], target_square[1]
+    if not getData(row, column, "Piece"):
         return
+    piece = getData(row, column, "Piece")
+    if isMoveLegal(row, column, target_row, target_column, piece):
+        movePiece(row, column, target_row, target_column, piece)
+        left, right, up, down = checkForKillAround(target_row, target_column, piece)
+        if left:
+            changePiece(target_row, str(int(target_column)-1), None)
+        if right:
+            changePiece(target_row, str(int(target_column)+1), None)
+        if up:
+            changePiece(intToLetter(letterToInt(target_row)-1), target_column, None)
+        if down:
+            changePiece(intToLetter(letterToInt(target_row)+1), target_column, None)
+        printCurrentTable()
 
 
 def letterToInt(row):
@@ -199,37 +159,55 @@ def checkSquareValidity(square):
     return True
 
 
-def checkForKillSquares(row, column, piece):
-    if piece == "1":
-        target = "2"
-    elif piece == "2" or piece == "3":
-        target = "1"
-    left, right, up, down, left_oob, right_oob, up_oob, down_oob = False, False, False, False, False, False, False, False
-    if letterToInt(row) == 1:
+def outOfBoundsCheck(target_row, target_column):
+    left_oob, right_oob, up_oob, down_oob = False, False, False, False
+    if letterToInt(target_row) == 1:
         up_oob = True
-    if letterToInt(row) == 9:
+    if letterToInt(target_row) == 9:
         down_oob = True
-    if column == "1":
+    if target_column == "1":
         left_oob = True
-    if column == "9":
+    if target_column == "9":
         right_oob = True
-    if not left_oob:
-        if getData(row, str(int(column) - 1), "Piece") == target or getData(row, str(int(column) - 1), "KillSquare"):
+    return left_oob, right_oob, up_oob, down_oob
+
+
+def checkForKillSquaresAround(target_row, target_column, piece):
+    left, right, up, down = False, False, False, False
+    lo, ro, uo, do = outOfBoundsCheck(target_row, target_column)
+    if not lo:
+        if isKillSquare(target_row, str(int(target_column) - 1), piece):
             left = True
-    if not right_oob:
-        if getData(row, str(int(column)+1), "Piece") == target or getData(row, str(int(column)+1), "KillSquare"):
+    if not ro:
+        if isKillSquare(target_row, str(int(target_column) + 1), piece):
             right = True
-    if not up_oob:
-        if getData(intToLetter(letterToInt(row)-1), column, "Piece") == target or getData(intToLetter(letterToInt(row)-1), column, "KillSquare"):
+    if not uo:
+        if isKillSquare(intToLetter(letterToInt(target_row) - 1), target_column, piece):
             up = True
-    if not down_oob:
-        if getData(intToLetter(letterToInt(row)+1), column, "Piece") == target or getData(intToLetter(letterToInt(row)+1), column, "KillSquare"):
+    if not do:
+        if isKillSquare(intToLetter(letterToInt(target_row) + 1), target_column, piece):
             down = True
     return left, right, up, down
 
 
-def checkForKill(row, column, piece):
-    left, right, up, down = checkForKillSquares(row, column, piece)
+def playVirtualMove(row, column, target_row, target_column):
+    piece = getData(row, column, "Piece")
+    changePiece(row, column, None)
+    changePiece(target_row, target_column, piece)
+
+
+def undoVirtualMove(row, column, target_row, target_column):
+    piece = getData(row, column, "Piece")
+    changePiece(target_row, target_column, None)
+    changePiece(row, column, piece)
+
+
+def checkForDeath(row, column, piece):
+    if piece == "1":
+        piece = "2"
+    elif piece == "2":
+        piece = "1"
+    left, right, up, down = checkForKillSquaresAround(row, column, piece)
     if left and right:
         return True
     if up and down:
@@ -237,26 +215,85 @@ def checkForKill(row, column, piece):
     return False
 
 
-def checkForKillAround(row, column, piece):
-    left, right, up, down, left_oob, right_oob, up_oob, down_oob = False, False, False, False, False, False, False, False
+def checkForKill(row, column, piece):
+
+
+
+def basicLegalityCheck(row, column, target_row, target_column, piece):
+    if getData(row, column, "Piece") is None:
+        print("Failed StartPieceCheck!")
+        return
+    if getData(target_row, target_column, "Piece") is not None:
+        print("Failed TargetPieceCheck!")
+        return
+    if target_row == "E" and target_column == "5":
+        if piece != "3":
+            print("Only king can enter the center square!")
+            return
+    elif target_row == "A" or target_row == "I":
+        if target_column == "1" or target_column == "9":
+            if piece != "3":
+                print("Only king can enter the corners!")
+                return
+    if rowOrColumn(row, column, target_row, target_column) == 1:
+        if not checkRow(row, column, target_column):
+            print("Failed checkRow!")
+            return False
+    elif rowOrColumn(row, column, target_row, target_column) == 2:
+        if not checkColumn(column, row, target_row):
+            print("Failed checkColumn!")
+            return False
+    else:
+        print("Must move in straight lines!")
+        return False
+    return True
+
+
+def rowOrColumn(row, column, target_row, target_column):
+    if row == target_row:
+        return 1
+    elif column == target_column:
+        return 2
+    return 0
+
+
+def movePiece(row, column, target_row, target_column, piece):
+    changePiece(row, column, None)
+    changePiece(target_row, target_column, piece)
+
+
+def isMoveLegal(row, column, target_row, target_column, piece):
+    if not basicLegalityCheck(row, column, target_row, target_column, piece):
+        print("Failed basicLegalityCheck!")
+        return False
+    if checkForDeath(target_row, target_column, piece):
+        playVirtualMove(row, column, target_row, target_column)
+        if not any(checkForKillAround(target_row, target_column, piece)):
+            print("Failed checkForKill!")
+            undoVirtualMove(row, column, target_row, target_column)
+            return False
+    return True
+
+
+def checkForEnemies(target_row, target_column, piece):
     if piece == "1":
-        piece = "2"
+        enemy = "2"
     elif piece == "2":
-        piece = "1"
-    if letterToInt(row) == 1:
-        up_oob = True
-    if letterToInt(row) == 9:
-        down_oob = True
-    if column == "1":
-        left_oob = True
-    if column == "9":
-        right_oob = True
-    if not left_oob:
-        left = checkForKill(row, str(int(column)-1), piece)
-    if not right_oob:
-        right = checkForKill(row, str(int(column)+1), piece)
-    if not up_oob:
-        up = checkForKill(intToLetter(letterToInt(row)-1), column, piece)
-    if not down_oob:
-        down = checkForKill(intToLetter(letterToInt(row)+1), column, piece)
-    return left, right, up, down
+        enemy = "1"
+
+
+def getEnemy(piece):
+    if piece == "1":
+        enemy = "2"
+    elif piece == "2":
+        enemy = "1"
+    return enemy
+
+
+def isKillSquare(target_row, target_column, piece):
+    if getData(target_row, target_column, "Piece") == getEnemy(piece) or getData(target_row, target_column, "KillSquare"):
+        return True
+"""
+CheckForDeath tarkistaa onko kohderuutu kahden vastustajan nappulan tai vastustajan nappulan ja tapporuudun välissä
+CheckForKillAround tarkistaa kuoleeko joku kohderuudun ympärillä olevista nappuloista jos nappula siiretään kohderuutuun
+"""
