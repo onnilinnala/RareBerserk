@@ -43,11 +43,11 @@ def start():
 def askForMove():
     start_square = input("Select piece: ").upper()
     target_square = input("Target square: ").upper()
-    if not tableapi.checkSquareValidity(start_square):
+    if not tableapi.checkSquareValidity(start_square, "Start"):
         print("Invalid square selected!\n")
         askForMove()
         return
-    if not tableapi.checkSquareValidity(target_square):
+    if not tableapi.checkSquareValidity(target_square, "Target"):
         print("Invalid square selected!\n")
         askForMove()
         return
