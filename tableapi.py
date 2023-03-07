@@ -343,11 +343,11 @@ def outOfBoundsCheck(target_row, target_column):
     if letterToInt(target_row) == 9:
         down_oob = True
 
-    # If column is 1 the square on the left would be 0 so it is out of bounds
+    # If column is 1 the square on the left would be 0, so it is out of bounds
     if target_column == "1":
         left_oob = True
 
-    # If column is 9 the square on the right would be 10 so it is out of bounds
+    # If column is 9 the square on the right would be 10, so it is out of bounds
     if target_column == "9":
         right_oob = True
 
@@ -371,7 +371,7 @@ def checkForKillSquaresAround(target_row, target_column, piece):
     # If right isn't out of bounds
     if not ro:
         # Check if the square on the right is either an enemy or a killSquare(corner or throne)
-        if isEnemyOrKillSquare(target_row, str(int(target_column)), piece):
+        if isEnemyOrKillSquare(target_row, str(int(target_column) + 1), piece):
             right = True
 
     # If up isn't out of bounds
@@ -454,7 +454,7 @@ def checkForKillsAround(row, column, target_row, target_column, piece, virtual):
     # Check if the directions are out of bounds to prevent errors
     lo, ro, uo, do = outOfBoundsCheck(target_row, target_column)
 
-    # If move isn't an actual move but apart of legality check play a virtual move to check kills correctly
+    # If move isn't an actual move but part of legality check play a virtual move to check kills correctly
     if virtual:
         playVirtualMove(row, column, target_row, target_column)
 
@@ -490,7 +490,7 @@ def checkForKillsAround(row, column, target_row, target_column, piece, virtual):
             if checkForDeath(intToLetter(letterToInt(target_row) + 1), target_column, getEnemy(piece)):
                 down = True
 
-    # If move isn't an actual move, but apart of legality check, undo the virtual move done previously
+    # If move isn't an actual move, but part of legality check, undo the virtual move done previously
     if virtual:
         undoVirtualMove(row, column, target_row, target_column)
 
@@ -508,25 +508,25 @@ def checkForKillsAroundThrone():
     # If the square on the left has an enemy piece
     if getPiece(target_row, str(int(target_column) - 1)):
         # If the enemy piece on the left will die after the move
-        if checkForDeath(target_row, str(int(target_column) - 1), "A") or checkForDeath(target_row, str(int(target_column) - 1), "D"):
+        if checkForDeath(target_row, str(int(target_column) - 1), getPiece(target_row, str(int(target_column) - 1))):
             left = True
 
     # If the square on the right has an enemy piece
     if getPiece(target_row, str(int(target_column) + 1)):
         # If the enemy piece on the right will die after the move
-        if checkForDeath(target_row, str(int(target_column) + 1), "A") or checkForDeath(target_row, str(int(target_column) + 1), "D"):
+        if checkForDeath(target_row, str(int(target_column) + 1), getPiece(target_row, str(int(target_column) + 1))):
             right = True
 
     # If the square on top has an enemy piece
     if getPiece(intToLetter(letterToInt(target_row) - 1), target_column):
         # If the enemy piece on top will die after the move
-        if checkForDeath(intToLetter(letterToInt(target_row) - 1), target_column, "A") or checkForDeath(intToLetter(letterToInt(target_row) - 1), target_column, "D"):
+        if checkForDeath(intToLetter(letterToInt(target_row) - 1), target_column, getPiece(intToLetter(letterToInt(target_row) - 1), target_column)):
             up = True
 
     # If the square below has an enemy piece
     if getPiece(intToLetter(letterToInt(target_row) + 1), target_column):
         # If the enemy piece below will die after the move
-        if checkForDeath(intToLetter(letterToInt(target_row) + 1), target_column, "A") or checkForDeath(intToLetter(letterToInt(target_row) + 1), target_column, "D"):
+        if checkForDeath(intToLetter(letterToInt(target_row) + 1), target_column, getPiece(intToLetter(letterToInt(target_row) + 1), target_column)):
             down = True
 
     # Return pieces that will die
@@ -570,7 +570,7 @@ def isMoveLegal(row, column, target_row, target_column, piece):
         if not checkColumn(column, row, target_row):
             # print("Can't go through other pieces!")
             return False
-    # If piece doesnt move along a row or a column the piece isn't moving in a straight line
+    # If piece doesn't move along a row or a column the piece isn't moving in a straight line
     else:
         # print("All pieces must move in a straight line!")
         return False
@@ -578,7 +578,7 @@ def isMoveLegal(row, column, target_row, target_column, piece):
     if checkForDeath(target_row, target_column, piece):
         # If the piece dies at the target square check if it can kill a piece there making the move legal
         if not any(checkForKillsAround(row, column, target_row, target_column, piece, True)):
-            #print("The target square would be an instant kill!")
+            # print("The target square would be an instant kill!")
             return False
     return True
 
@@ -598,7 +598,7 @@ def isEnemyOrKillSquare(target_row, target_column, piece):
         return True
 
 
-# Check if given square is a corner or The Throne and if Throne check if king has moved
+# Check if given square is a corner or The Throne and if checking Throne check if king has moved
 def isKillSquare(target_row, target_column):
     if target_row == "A" or target_row == "I":
         if target_column == "1" or target_column == "9":
@@ -610,9 +610,9 @@ def isKillSquare(target_row, target_column):
 
 
 def checkThroneKills():
-    #print("Checking Throne kills!")
+    # print("Checking Throne kills!")
     left, right, up, down = checkForKillsAroundThrone()
-    #print(left, right, up, down)
+    # print(left, right, up, down)
     afterMoveKill(left, right, up, down, "E", "5")
 
 
@@ -632,12 +632,12 @@ def getKingSquare():
 
 
 def attackersWin():
-    #print("Attackers win!")
+    # print("Attackers win!")
     setWinner("A")
 
 
 def defendersWin():
-    #print("Defenders win!")
+    # print("Defenders win!")
     setWinner("D")
 
 
